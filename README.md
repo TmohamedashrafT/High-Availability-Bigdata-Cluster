@@ -10,11 +10,6 @@ A fully distributed, high-availability big data cluster built with Docker, featu
 - ⚡ Spark (fast processing)
 - 🌀 Tez (optimized execution)
 
-# High Availability Big Data Cluster Architecture
-
-## Core Components
-# High Availability Big Data Cluster
-
 ## 📌 Architecture Overview
 
 ### 🗂️ Core Components

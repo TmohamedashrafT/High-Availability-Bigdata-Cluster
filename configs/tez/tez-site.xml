@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+  Tez Framework Configuration
+  Defines essential properties for Tez execution on YARN
+-->
+
+<configuration>
+
+    <!-- Tez Libraries Location -->
+    <property>
+        <name>tez.lib.uris</name>
+        <value>${fs.default.name}/apps/tez/tez.tar.gz</value>
+        <description>
+            HDFS path to Tez binaries archive (tez.tar.gz).
+            Must be accessible by all cluster nodes.
+        </description>
+    </property>
+
+    <!-- Application Master Configuration -->
+    <property>
+        <name>tez.am.user.name</name>
+        <value>root</value>
+        <description>
+            User identity for Tez Application Master.
+        </description>
+    </property>
+
+</configuration>

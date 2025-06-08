@@ -1,0 +1,261 @@
+services:
+  zk1:
+    build:
+      context: .
+      target: zookeeper
+    container_name: zk1
+    hostname: zk1
+    networks:
+      - clusternet
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo ruok | nc localhost 2181"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
+
+  zk2:
+    build:
+      context: .
+      target: zookeeper
+    container_name: zk2
+    hostname: zk2
+    networks:
+      - clusternet
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo ruok | nc localhost 2181"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
+
+  zk3:
+    build:
+      context: .
+      target: zookeeper
+    container_name: zk3
+    hostname: zk3
+    networks:
+      - clusternet
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo ruok | nc localhost 2181"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
+
+  master1:
+    build:
+      context: .
+      target: hadoop-base
+    container_name: master1
+    hostname: master1
+    volumes:
+      - ./shared_code:/shared_code
+    ports:
+      - "9871:9870"
+      - "8071:8088"
+    networks:
+      - clusternet
+    depends_on:
+      zk1:
+        condition: service_healthy
+      zk2:
+        condition: service_healthy
+      zk3:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bash", "-c", "(hdfs haadmin -getAllServiceState | grep -Eq 'active|standby') && (yarn rmadmin -getAllServiceState | grep -Eq 'active|standby')"]
+      interval: 10s
+      retries: 10
+      start_period: 30s
+      timeout: 5s
+
+  master2:
+    build:
+      context: .
+      target: hadoop-base
+    container_name: master2
+    hostname: master2
+    volumes:
+      - ./shared_code:/shared_code
+    ports:
+      - "9872:9870"
+      - "8072:8088"
+    networks:
+      - clusternet
+    depends_on:
+      zk1:
+        condition: service_healthy
+      zk2:
+        condition: service_healthy
+      zk3:
+        condition: service_healthy
+
+  master3:
+    build:
+      context: .
+      target: hadoop-base
+    container_name: master3
+    hostname: master3
+    volumes:
+      - ./shared_code:/shared_code
+    ports:
+      - "9873:9870"
+      - "8073:8088"
+    networks:
+      - clusternet
+    depends_on:
+      zk1:
+        condition: service_healthy
+      zk2:
+        condition: service_healthy
+      zk3:
+        condition: service_healthy
+
+  worker1:
+    build:
+      context: .
+      target: hadoop-base
+    container_name: worker1
+    hostname: worker1
+    volumes:
+      - ./shared_code:/shared_code
+      - worker1_data:/opt/cluster/hadoop/datanode
+    networks:
+      - clusternet
+    depends_on:
+      master1:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:15
+    container_name: postgres-hive
+    hostname: postgres-hive
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: hive
+      POSTGRES_PASSWORD: hive
+      POSTGRES_DB: metastore
+    networks:
+      - clusternet
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "hive", "-d", "metastore"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  metastore:
+    build:
+      context: .
+      target: hive
+    container_name: metastore
+    hostname: metastore
+    ports:
+      - "9083:9083"
+    networks:
+      - clusternet
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  hiveserver2:
+    build:
+      context: .
+      target: hive
+    container_name: hiveserver
+    hostname: hiveserver
+    ports:
+      - "10000:10000"
+      - "10002:10002"
+    networks:
+      - clusternet
+    depends_on:
+      - metastore
+      - worker1
+
+  sparkclient:
+    build:
+      context: .
+      target: hadoop-with-spark
+    container_name: sparkclient
+    hostname: sparkclient
+    volumes:
+      - ./shared_code:/shared_code
+    ports:
+      - "4040:4040"
+      - "18080:18080"
+    networks:
+      - clusternet
+    depends_on:
+      master1:
+        condition: service_healthy
+
+  hmaster1:
+    build:
+      context: .
+      target: hbase
+    container_name: hmaster1
+    hostname: hmaster1
+    ports:
+      - "16001:16000"
+      - "16011:16010"
+    networks:
+      - clusternet
+    depends_on:
+      master1:
+        condition: service_healthy
+
+  hmaster2:
+    build:
+      context: .
+      target: hbase
+    container_name: hmaster2
+    hostname: hmaster2
+    ports:
+      - "16002:16000"
+      - "16012:16010"
+    networks:
+      - clusternet
+    depends_on:
+      master1:
+        condition: service_healthy
+
+  rsworker1:
+    build:
+      context: .
+      target: hbase
+    container_name: rsworker1
+    hostname: rsworker1
+    volumes:
+      - rs_worker1_data:/opt/cluster/hadoop/datanode
+    networks:
+      - clusternet
+    depends_on:
+      - hmaster1
+
+  rsworker2:
+    build:
+      context: .
+      target: hbase
+    container_name: rsworker2
+    hostname: rsworker2
+    volumes:
+      - rs_worker2_data:/opt/cluster/hadoop/datanode
+    networks:
+      - clusternet
+    depends_on:
+      - hmaster1
+
+volumes:
+  db_data:
+  rs_worker1_data:
+  rs_worker2_data:
+  worker1_data:
+
+networks:
+  clusternet:
+    name: clusternet

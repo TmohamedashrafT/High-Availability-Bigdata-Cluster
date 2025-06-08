@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License. See accompanying LICENSE file.
+-->
+
+<!-- HDFS-specific configuration properties -->
+
+<configuration>
+
+    <!-- HDFS HA (High Availability) Configuration -->
+    <property>
+        <name>dfs.nameservices</name>
+        <value>ashrafcluster</value>
+        <description>
+            Logical name for the HDFS cluster. Used to reference the cluster in HA configurations.
+        </description>
+    </property>
+
+    <property>
+        <name>dfs.ha.namenodes.ashrafcluster</name>
+        <value>namenode1,namenode2,namenode3</value>
+        <description>
+            List of NameNode IDs for the HA cluster. These IDs are used to configure
+            RPC and HTTP addresses for each NameNode.
+        </description>
+    </property>
+
+    <!-- NameNode RPC Addresses -->
+    <property>
+        <name>dfs.namenode.rpc-address.ashrafcluster.namenode1</name>
+        <value>master1:8020</value>
+    </property>
+    <property>
+        <name>dfs.namenode.rpc-address.ashrafcluster.namenode2</name>
+        <value>master2:8020</value>
+    </property>
+    <property>
+        <name>dfs.namenode.rpc-address.ashrafcluster.namenode3</name>
+        <value>master3:8020</value>
+        <description>
+            RPC addresses for each NameNode. Clients use these addresses to communicate
+            with the NameNodes.
+        </description>
+    </property>
+
+    <!-- NameNode HTTP Addresses -->
+    <property>
+        <name>dfs.namenode.http-address.ashrafcluster.namenode1</name>
+        <value>master1:9870</value>
+    </property>
+    <property>
+        <name>dfs.namenode.http-address.ashrafcluster.namenode2</name>
+        <value>master2:9870</value>
+    </property>
+    <property>
+        <name>dfs.namenode.http-address.ashrafcluster.namenode3</name>
+        <value>master3:9870</value>
+        <description>
+            HTTP addresses for each NameNode. Used for accessing the NameNode web UI.
+        </description>
+    </property>
+
+    <!-- Shared Edits Directory (JournalNodes) -->
+    <property>
+        <name>dfs.namenode.shared.edits.dir</name>
+        <value>qjournal://master1:8485;master2:8485;master3:8485/ashrafcluster</value>
+        <description>
+            Location of the shared edits directory (JournalNodes) for HA.
+            JournalNodes store the edit logs shared between NameNodes.
+        </description>
+    </property>
+
+    <property>
+        <name>dfs.journalnode.edits.dir</name>
+        <value>/opt/cluster/hadoop/hdfs/journalnode</value>
+        <description>
+            Local filesystem path where JournalNodes store their edit logs.
+        </description>
+    </property>
+
+    <!-- HA Failover Configuration -->
+    <property>
+        <name>dfs.client.failover.proxy.provider.ashrafcluster</name>
+        <value>org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider</value>
+        <description>
+            Class responsible for failover between NameNodes in an HA cluster.
+        </description>
+    </property>
+
+    <property>
+        <name>dfs.ha.automatic-failover.enabled</name>
+        <value>true</value>
+        <description>
+            Enables automatic failover for the HA cluster. Requires ZooKeeper.
+        </description>
+    </property>
+
+    <!-- Data Replication and Storage -->
+    <property>
+        <name>dfs.replication</name>
+        <value>2</value>
+        <description>
+            Default replication factor for HDFS blocks. Determines how many copies
+            of each block are stored across the cluster.
+        </description>
+    </property>
+
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>/opt/cluster/hadoop/datanode</value>
+        <description>
+            Local filesystem path where DataNodes store their blocks.
+        </description>
+    </property>
+
+    <!-- Advanced Configuration -->
+    <property>
+        <name>dfs.ha.fencing.methods</name>
+        <value>shell(/bin/true)</value>
+        <description>
+            Fencing method to use during failover. This example uses a no-op fence.
+            In production, use a proper fencing method (e.g., SSH).
+        </description>
+    </property>
+
+    <property>
+        <name>dfs.block.replicator.classname</name>
+        <value>org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicyRackFaultTolerant</value>
+        <description>
+            Custom block placement policy for fault-tolerant replication across racks.
+        </description>
+    </property>
+
+</configuration>

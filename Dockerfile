@@ -29,7 +29,7 @@ ARG HADOOP_VERSION=3.3.6
 WORKDIR $WORKDIR
 
 # Download and extract Hadoop using ADD
-RUN wget https://downloads.apache.org/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz $WORKDIR/ && \
+RUN wget https://downloads.apache.org/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz  && \
     tar -xzf hadoop-${HADOOP_VERSION}.tar.gz && \
     mv hadoop-${HADOOP_VERSION} hadoop && \
     rm hadoop-${HADOOP_VERSION}.tar.gz
@@ -54,7 +54,7 @@ ARG ZK_VERSION=3.8.4
 WORKDIR $WORKDIR
 
 # Download and extract ZooKeeper using ADD
-RUN wget https://downloads.apache.org/zookeeper/zookeeper-${ZK_VERSION}/apache-zookeeper-${ZK_VERSION}-bin.tar.gz $WORKDIR/ && \
+RUN wget https://downloads.apache.org/zookeeper/zookeeper-${ZK_VERSION}/apache-zookeeper-${ZK_VERSION}-bin.tar.gz  && \
     tar -xzf apache-zookeeper-${ZK_VERSION}-bin.tar.gz && \
     mv apache-zookeeper-${ZK_VERSION}-bin zookeeper && \
     rm apache-zookeeper-${ZK_VERSION}-bin.tar.gz
@@ -78,7 +78,7 @@ ENV PATH=$PATH:$HBASE_HOME/bin
 
 WORKDIR $WORKDIR
 
-RUN wget https://archive.apache.org/dist/hbase/${HBASE_VERSION}/hbase-${HBASE_VERSION}-bin.tar.gz $WORKDIR/ && \
+RUN wget https://archive.apache.org/dist/hbase/${HBASE_VERSION}/hbase-${HBASE_VERSION}-bin.tar.gz  && \
     tar -xzf hbase-${HBASE_VERSION}-bin.tar.gz && \
     mv hbase-${HBASE_VERSION} $HBASE_HOME && \
     rm hbase-${HBASE_VERSION}-bin.tar.gz
@@ -103,8 +103,8 @@ ENV PATH=$PATH:$HIVE_HOME/bin:$TEZ_HOME/bin
 WORKDIR $WORKDIR
 
 # Download and extract Spark, Tez, and Hive using ADD
-RUN wget https://downloads.apache.org/tez/${TEZ_VERSION}/apache-tez-${TEZ_VERSION}-bin.tar.gz $WORKDIR/ && \
-    wget https://dlcdn.apache.org/hive/hive-${HIVE_VERSION}/apache-hive-${HIVE_VERSION}-bin.tar.gz $WORKDIR/ && \
+RUN wget https://downloads.apache.org/tez/${TEZ_VERSION}/apache-tez-${TEZ_VERSION}-bin.tar.gz  && \
+    wget https://dlcdn.apache.org/hive/hive-${HIVE_VERSION}/apache-hive-${HIVE_VERSION}-bin.tar.gz  && \
     tar -xzf apache-tez-${TEZ_VERSION}-bin.tar.gz && \
     tar -xzf apache-hive-${HIVE_VERSION}-bin.tar.gz && \
     mv apache-tez-${TEZ_VERSION}-bin $TEZ_HOME && \
@@ -126,7 +126,7 @@ ENV SPARK_LOCAL_HOSTNAME=localhost
 ENV PATH=$PATH:$SPARK_HOME/bin
 WORKDIR $WORKDIR
 
-RUN wget https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz $WORKDIR/ && \
+RUN wget https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz  && \
     tar -xzf spark-${SPARK_VERSION}-bin-hadoop3.tgz && \
     mv spark-${SPARK_VERSION}-bin-hadoop3 $SPARK_HOME && \
     rm spark-${SPARK_VERSION}-bin-hadoop3.tgz
